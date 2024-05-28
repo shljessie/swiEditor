@@ -1,10 +1,11 @@
-import terser from '@rollup/plugin-terser'
-import resolve from "@rollup/plugin-node-resolve"
-import typescript from "rollup-plugin-typescript2"
-import postcss from "rollup-plugin-postcss"
-import dts from "rollup-plugin-dts"
-import commonjs from "rollup-plugin-commonjs"
-import svg from "rollup-plugin-svg-import"
+import commonjs from "rollup-plugin-commonjs";
+import copy from 'rollup-plugin-copy';
+import dts from "rollup-plugin-dts";
+import postcss from "rollup-plugin-postcss";
+import resolve from "@rollup/plugin-node-resolve";
+import svg from "rollup-plugin-svg-import";
+import terser from '@rollup/plugin-terser';
+import typescript from "rollup-plugin-typescript2";
 
 export default [
   {
@@ -37,6 +38,11 @@ export default [
       }),
       svg({
         stringify: true
+      }),
+      copy({
+        targets: [
+          { src: 'src/index.html', dest: 'dist' }
+        ]
       })
     ],
   },
@@ -53,4 +59,4 @@ export default [
       format: "es",
     }
   }
-]
+];

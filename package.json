@@ -22,8 +22,7 @@
     "dist",
     "package.json"
   ],
-  "homepage": "https://myscript.github.io/iinkTS/",
-  "repository": "git://github.com/MyScript/iinkTS.git",
+  "homepage": "https://shljessie.github.io/swiEditor",
   "scripts": {
     "lint": "eslint ./src --ext .ts",
     "lint:fix": "eslint ./src --ext .ts --fix",
@@ -33,9 +32,8 @@
     "build:lib": "rollup -c config/rollup.config.build.mjs --sourcemap",
     "build": "npm-run-all lint:fix test:unit build:lib build:docs",
     "dev": "rollup -c config/rollup.config.dev.mjs -w --sourcemap",
-    "start": "node dist/iink.js",
+    "start": "node dist/iink.min.js",
     "deploy": "gh-pages -d dist"
-    
   },
   "dependencies": {
     "@david8128/ai21": "^1.2.0",
@@ -68,6 +66,7 @@
     "postcss": "^8.4.31",
     "rollup": "^4.1.4",
     "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-copy": "^3.5.0",
     "rollup-plugin-delete": "^2.0.0",
     "rollup-plugin-dts": "^6.1.0",
     "rollup-plugin-livereload": "^2.0.5",
