@@ -32,10 +32,14 @@
     "build:docs": "typedoc",
     "build:lib": "rollup -c config/rollup.config.build.mjs --sourcemap",
     "build": "npm-run-all lint:fix test:unit build:lib build:docs",
-    "dev": "rollup -c config/rollup.config.dev.mjs -w --sourcemap"
+    "dev": "rollup -c config/rollup.config.dev.mjs -w --sourcemap",
+    "start": "node dist/iink.js"
   },
   "dependencies": {
-    "json-css": "^1.5.6"
+    "@david8128/ai21": "^1.2.0",
+    "axios": "^1.7.2",
+    "json-css": "^1.5.6",
+    "node-fetch": "^2.7.0"
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^15.2.3",

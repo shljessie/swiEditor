@@ -7,6 +7,7 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="HandheldFriendly" content="true" />
     <title>Websocket Text Eraser</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" />
     <link rel="stylesheet" href="../assets/style/reset.css" />
     <link rel="stylesheet" href="../assets/style/components.css" />
     <link rel="stylesheet" href="../assets/style/examples.css" />
@@ -24,6 +25,42 @@
         #editor {
           height: calc(100vh - 150px);
         }
+      }
+      .underline {
+        text-decoration: underline;
+      }
+      .plus-icon {
+        width: 16px;
+        height: 16px;
+        cursor: pointer;
+        position: absolute;
+        right: -20px;
+        top: 0;
+      }
+      .toggle-btn {
+        width: 100px;
+        height: 50px;
+        cursor: pointer;
+        position: absolute;
+        background-color: white;
+        color: black;
+        border-radius: 10%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 16px;
+        z-index:1000;
+        font-family: 'Patrick Hand', cursive;
+      }
+      .toolbox {
+        display: none; /* Initially hidden */
+        position: absolute;
+        background-color: none;
+        padding: 10px;
+        z-index: 1000;
+        width:500px;
+        height:500px;
+        font-family: 'Patrick Hand', cursive;
       }
     </style>
   </head>
@@ -52,25 +89,189 @@
       </label>
     </nav>
 
-    <div id="editor" touch-action="none"></div>
+    <div id="editor" touch-action="none"> </div>
+
+    <div id="toolbox" class="toolbox">
+      <p id="tooltip-content">Toolbox Content Here</p>
+    </div>
 
     <script>
       const editorElement = document.getElementById("editor");
-
+    
       const undoElement = document.getElementById("undo");
       const redoElement = document.getElementById("redo");
       const eraserElement = document.getElementById("eraser");
       const penElement = document.getElementById("pen");
       const erasePreciselyElement = document.getElementById("erase-precisely");
+      const highlightListElement = document.getElementById("highlight-list");
 
-      /**
-       * we expose the editor for use in the integration test
-       */
+      const toolbox = document.getElementById("toolbox");
+      const tooltipContent = document.getElementById("tooltip-content");
+
+      
+    
       let editor;
+      let isTooltipVisible = false;
 
-      /**
-       * We use a function to wait the server configuration to load
-       */
+      function toggleTooltip(event, suggestion, originalText, correct) {
+        
+      isTooltipVisible = !isTooltipVisible;
+      if (isTooltipVisible) {
+        console.log('TOGGLE TOOLTIP', event, 'sugestion', suggestion,'originaltext', originalText,'correct', correct);
+        showTooltip(event, suggestion, originalText, correct);
+      } else {
+        hideTooltip();
+      }
+      }
+
+      function showTooltip(event, suggestion, originalText, correct) {
+        console.log('show Tooltip data', event, 'sugestion', suggestion,'originaltext', originalText,'correct', correct);
+        tooltipContent.innerHTML = correct ? `Correct: ${correct}` : `Incorrect: ${originalText} <br> Suggestion: ${suggestion}`;
+        toolbox.style.display = 'block';
+        toolbox.style.left = `${event.clientX}px`;
+        toolbox.style.top = `${event.clientY}px`;
+      }
+
+      function hideTooltip() {
+        toolbox.style.display = 'none';
+      }
+
+      function createToggleButton(left, top, suggestion, originalText, correct) {
+      const button = document.createElement("button");
+      button.setAttribute("class", "toggle-btn");
+      button.textContent = "See Lesson";
+      button.style.left = `${left}px`;
+      button.style.top = `${top}px`;
+      button.addEventListener("click", (event) => {
+          event.stopPropagation();
+          console.log('CREATE BUTTON', event, 'sugestion', suggestion,'originaltext', originalText,'correct', correct);
+          setTimeout(() => toggleTooltip(event, suggestion, originalText, correct), 0); // Add delay to separate events
+        });
+        editorElement.appendChild(button);
+        return button;
+      }
+
+      function createPlusIcon() {
+          const svgNS = "http://www.w3.org/2000/svg";
+          const svg = document.createElementNS(svgNS, "svg");
+          svg.setAttribute("class", "plus-icon");
+          svg.setAttribute("viewBox", "0 0 24 24");
+          svg.setAttribute("width", "24");
+          svg.setAttribute("height", "24");
+          svg.setAttribute("data-tooltip", "Additional information"); // Add tooltip content here
+          svg.innerHTML = `
+            <circle cx="12" cy="12" r="10" stroke="black" stroke-width="2" fill="black" />
+            <line x1="12" y1="6" x2="12" y2="18" stroke="white" stroke-width="2" />
+            <line x1="6" y1="12" x2="18" y2="12" stroke="white" stroke-width="2" />
+          `;
+          svg.addEventListener("click", (event) => {
+            console.log('CLIKCED SVG', event)
+            event.stopPropagation();
+            setTimeout(() => showTooltip(event), 0); // Add delay to separate events
+          });
+          return svg;
+        }
+
+      async function spellCheck(word, span) {
+        const url = 'https://api.ai21.com/studio/v1/gec';
+        const options = {
+          method: 'POST',
+          headers: {
+            accept: 'application/json',
+            'content-type': 'application/json',
+            Authorization: 'Bearer GzEiUAgBjzJqBUOooHifDpN0WY55a5l7'
+          },
+          body: JSON.stringify({ text: word })
+        };
+
+        let correct = '';
+        let suggestion = '';
+        let originalText = '';
+    
+        try {
+          const response = await fetch(url, options);
+          const json = await response.json();
+          suggestion = json.corrections[0]?.suggestion;
+          originalText = json.corrections[0].originalText;
+          span.classList.add('underline');
+
+          if(suggestion.toLowerCase() == originalText){
+            console.log('correct Spelling,', suggestion.toLowerCase(),originalText, true )
+            // if the word was spelled correctly
+            correct = true;
+            suggestion =suggestion.toLowerCase();
+            
+          }else{
+            console.log('INcorrect Spelling,', suggestion.toLowerCase(),originalText, false )
+            correct = false;
+            suggestion =suggestion.toLowerCase();
+          }
+          
+        } catch (err) {
+          console.error('error:', err);
+        }
+
+        return {suggestion, originalText, correct};
+      }
+
+
+      async function handleTextChange(event) {
+          undoElement.disabled = !event.detail.canUndo;
+          redoElement.disabled = !event.detail.canRedo;
+          const textSpans = editorElement.querySelectorAll(".added-word");
+
+          const uni = document.getElementById("editor");
+          const modelViewTransformElement = editorElement.querySelector("#MODEL-viewTransform");
+          const rootBoxElement = modelViewTransformElement.querySelector("g[id$='-RootBox']");
+
+          let writtenWord = "";
+          for (const span of textSpans) {
+            const word = span.textContent;
+            console.log('detected word', word);
+            if (word.length > 3) {
+              let { suggestion, originalText, correct } = await spellCheck(word, span);
+              console.log('spellcheck result', suggestion, originalText, correct);
+              if (correct) {
+                console.log('correct word, not underlining', suggestion, originalText, correct);
+              } else {
+                console.log('incorrect word, underlining', suggestion, originalText, correct);
+                const s = suggestion;
+                const o = originalText;
+                const c= correct
+
+                if (rootBoxElement) {
+                  const bbox = rootBoxElement.getBBox();
+                  const underline = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                  underline.setAttribute("x1", bbox.x);
+                  underline.setAttribute("y1", bbox.y + bbox.height + 2); // Slightly below the rootBoxElement
+                  underline.setAttribute("x2", bbox.x + bbox.width);
+                  underline.setAttribute("y2", bbox.y + bbox.height + 2); // Slightly below the rootBoxElement
+                  underline.setAttribute("stroke", "red");
+                  underline.setAttribute("stroke-width", "2");
+
+                  const existingUnderline = rootBoxElement.querySelector("line[stroke='red']");
+                  if (!existingUnderline) {
+                    rootBoxElement.appendChild(underline);
+                    console.log('SEND DATA', event, 'sugestion', s,'originaltext', o,'correct', c);
+                    console.log('current',bbox.x + bbox.width, bbox.y + bbox.height + 10)
+                    const svgRect = rootBoxElement.getBoundingClientRect();
+
+                    // Calculate button position
+                    console.log('svgRect x', svgRect.x);
+                    console.log('svgRect y', svgRect.y);
+
+
+                    createToggleButton(svgRect.x, svgRect.y + 50, s, o, c); // Adjust the y coordinate to be below the underline
+                  }
+                }
+              }
+            }
+            writtenWord += word + " ";
+          }
+        }
+
+    
+
       async function loadEditor() {
         const res = await fetch("../server-configuration.json");
         const conf = await res.json();
@@ -85,35 +286,45 @@
               text: {
                 eraser: {
                   "erase-precisely": false
+                },
+                "raw-content":{
+                  "highlight-text":true
+                }
+              },
+              export: {
+                jiix: {
+                  style: true
                 }
               }
             }
           }
         };
+
         /**
-         * Instanciate editor
-         * @param {Element} The DOM element to attach the ink paper
-         * @param {Object} The Editor parameters
-         */
+       * Instanciate editor
+       * @param {Element} The DOM element to attach the ink paper
+       * @param {Object} The Editor parameters
+       */
+    
         editor = new iink.Editor(editorElement, options);
-        /**
-         *  async initialize editor behaviors
-         */
         await editor.initialize();
 
-        editorElement.addEventListener("changed", (event) => {
-          undoElement.disabled = !event.detail.canUndo;
-          redoElement.disabled = !event.detail.canRedo;
-        });
 
+    
+        editorElement.addEventListener("changed", async (event) => {
+          // undoElement.disabled = !event.detail.canUndo;
+          // redoElement.disabled = !event.detail.canRedo;
+          await handleTextChange(event);
+        });
+    
         undoElement.addEventListener("click", () => {
           editor.undo();
         });
-
+    
         redoElement.addEventListener("click", () => {
           editor.redo();
         });
-
+    
         eraserElement.addEventListener("click", () => {
           editor.intention = iink.Intention.Erase;
           eraserElement.disabled = true;
@@ -121,7 +332,7 @@
           penElement.disabled = false;
           penElement.classList.remove("active");
         });
-
+    
         penElement.addEventListener("click", () => {
           editor.intention = iink.Intention.Write;
           eraserElement.disabled = false;
@@ -129,7 +340,7 @@
           penElement.disabled = true;
           penElement.classList.add("active");
         });
-
+    
         erasePreciselyElement.addEventListener("change", (e) => {
           const configuration = { ...editor.configuration };
           configuration.recognition.text.eraser["erase-precisely"] = e.target.checked;
@@ -140,13 +351,17 @@
           penElement.disabled = true;
           penElement.classList.add("active");
         });
-
+    
         window.addEventListener("resize", () => {
           editor.resize();
         });
       };
-
-      loadEditor().catch(error => console.error(error));
+    
+      loadEditor().catch(error => console.error('Error loading editor:', error));
     </script>
+    
+
+
+
   </body>
 </html>

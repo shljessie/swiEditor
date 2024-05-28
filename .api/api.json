@@ -1,0 +1,11 @@
+{
+  "version": "1.0",
+  "apis": [
+    {
+      "identifier": "ai21-studio",
+      "source": "@ai21-studio/v4.0#8nuu5g4joln33560d",
+      "integrity": "sha512-guJzlo+NVzUAkYFHLrQIMWUI2Sno4EqRtP0YSTJCrMm6RQFvJE1ejnKEXLGqoJBPcmn2CQAW+2krjPILh5gGkQ==",
+      "installerVersion": "6.1.1"
+    }
+  ]
+}

@@ -1,268 +1,308 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="HandheldFriendly" content="true" />
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="HandheldFriendly" content="true">
 
-    <title>Highlight words</title>
+  <title>Highlight words</title>
 
-    <link rel="stylesheet" href="../assets/style/reset.css" />
-    <link rel="stylesheet" href="../assets/style/components.css" />
-    <link rel="stylesheet" href="../assets/style/examples.css" />
+  <link rel="stylesheet" href="../assets/style/reset.css">
+  <link rel="stylesheet" href="../assets/style/components.css">
+  <link rel="stylesheet" href="../assets/style/examples.css">
 
-    <script type="text/javascript" src="../../dist/iink.min.js"></script>
-    <style type="text/css">
+  <script type="text/javascript" src="../../dist/iink.min.js"></script>
+  <style type="text/css">
+    #editor {
+      width: auto;
+      height: calc(100vh - 66px);
+    }
+    @media only screen and (max-width: 889px) {
       #editor {
-        width: auto;
-        height: calc(100vh - 66px);
+        height: calc(100vh - 114px);
       }
-      @media only screen and (max-width: 889px) {
-        #editor {
-          height: calc(100vh - 114px);
-        }
-      }
-      @media only screen and (max-width: 600px) {
-        .highlight-column {
-          position: absolute;
-          right: 0;
-        }
-      }
-      @media only screen and (max-width: 454px) {
-        #editor {
-          height: calc(100vh - 143px);
-        }
-      }
-      .wrapper {
-        height: 100vh;
-        width: 100vw;
-      }
-      .editor-column {
-        width: 80%;
-      }
-      .colors {
-        display: flex;
-        overflow: auto;
-      }
-      .pensettings {
-        text-align: center;
-        user-select: none;
-        margin-right: 12px;
-      }
-      .color {
-        width: 36px;
-        height: 36px;
-        border: 1px solid silver;
-        border-radius: 50%;
-      }
-      .check {
-        border-bottom: 2px solid #000;
-        border-right: 2px solid #000;
-        display: inline-block;
-        transform: rotate(45deg);
-        height: 16px;
-        width: 8px;
-      }
+    }
+    @media only screen and (max-width: 600px) {
       .highlight-column {
-        background-color: white;
-        padding: 12px;
-        height: 100%;
-        min-width: 20%;
-        border-left: 1px solid #d7dde3;
+        position: absolute;
+        right: 0;
       }
-      .highlight-column .colored .header {
-        width: auto;
-        height: 10px;
+    }
+    @media only screen and (max-width: 454px) {
+      #editor {
+        height: calc(100vh - 143px);
       }
-    </style>
-  </head>
-  <body>
-    <div class="flex-container wrap wrapper">
-      <div class="editor-column">
-        <nav class="flex-container wrap gap between">
-          <div class="flex-container wrap gap">
-            <button id="undo" class="nav-btn btn-fab-mini btn-lightBlue" disabled>
-              <img src="../assets/img/undo.svg" />
-            </button>
-            <button id="redo" class="nav-btn btn-fab-mini btn-lightBlue" disabled>
-              <img src="../assets/img/redo.svg" />
+    }
+    .wrapper {
+      height: 100vh;
+      width: 100vw;
+    }
+    .editor-column {
+      width: 80%;
+    }
+    .colors {
+      display: flex;
+      overflow: auto;
+    }
+    .pensettings {
+      text-align: center;
+      user-select: none;
+      margin-right: 12px;
+    }
+    .color {
+      width: 36px;
+      height: 36px;
+      border: 1px solid silver;
+      border-radius: 50%;
+    }
+    .check {
+      border-bottom: 2px solid #000;
+      border-right: 2px solid #000;
+      display: inline-block;
+      transform: rotate(45deg);
+      height: 16px;
+      width: 8px;
+    }
+    .highlight-column {
+      background-color: white;
+      padding: 12px;
+      height: 100%;
+      min-width: 20%;
+      border-left: 1px solid #d7dde3;
+    }
+    .highlight-column .colored .header {
+      width: auto;
+      height: 10px;
+    }
+    .underline {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="flex-container wrap wrapper">
+    <div class="editor-column">
+      <nav class="flex-container wrap gap between">
+        <div class="flex-container wrap gap">
+          <button id="undo" class="nav-btn btn-fab-mini btn-lightBlue" disabled>
+            <img src="../assets/img/undo.svg">
+          </button>
+          <button id="redo" class="nav-btn btn-fab-mini btn-lightBlue" disabled>
+            <img src="../assets/img/redo.svg">
+          </button>
+        </div>
+        <div>Surround your words to highlight them</div>
+        <div class="colors">
+          <div class="pensettings" data-color="#000000">
+            <button id="black-btn" class="color" style="background-color: rgb(0, 0, 0)">
+              <span id="check" class="check" style="border-color: white"></span>
             </button>
           </div>
-          <div>Surround your words to highlight them</div>
-          <div class="colors">
-            <div class="pensettings" data-color="#000000">
-              <button id="black-btn" class="color" style="background-color: rgb(0, 0, 0)">
-                <span id="check" class="check" style="border-color: white"></span>
-              </button>
-            </div>
-            <div class="pensettings" data-color="#808080">
-              <button id="dark-grey-btn" class="color" style="background-color: rgb(128, 128, 128)"></button>
-            </div>
-            <div class="pensettings" data-color="#d9d9d9">
-              <button id="light-grey-btn" class="color" style="background-color: rgb(217, 217, 217)"></button>
-            </div>
-            <div class="pensettings" data-color="#1a8cff">
-              <button id="blue-btn" class="color" style="background-color: rgb(26, 140, 255)"></button>
-            </div>
-            <div class="pensettings" data-color="#ff1a40">
-              <button id="red-btn" class="color" style="background-color: rgb(255, 26, 64)"></button>
-            </div>
-            <div class="pensettings" data-color="#2bd965">
-              <button id="green-btn" class="color" style="background-color: rgb(43, 217, 101)"></button>
-            </div>
-            <div class="pensettings" data-color="#ffdd33">
-              <button id="yellow-btn" class="color" style="background-color: rgb(255, 221, 51)"></button>
-            </div>
+          <div class="pensettings" data-color="#808080">
+            <button id="dark-grey-btn" class="color" style="background-color: rgb(128, 128, 128)"></button>
           </div>
-        </nav>
-        <div id="editor" touch-action="none"></div>
-      </div>
-      <div class="highlight-column">
-        <ul id="highlight-list">
-
-        </ul>
-      </div>
+          <div class="pensettings" data-color="#d9d9d9">
+            <button id="light-grey-btn" class="color" style="background-color: rgb(217, 217, 217)"></button>
+          </div>
+          <div class="pensettings" data-color="#1a8cff">
+            <button id="blue-btn" class="color" style="background-color: rgb(26, 140, 255)"></button>
+          </div>
+          <div class="pensettings" data-color="#ff1a40">
+            <button id="red-btn" class="color" style="background-color: rgb(255, 26, 64)"></button>
+          </div>
+          <div class="pensettings" data-color="#2bd965">
+            <button id="green-btn" class="color" style="background-color: rgb(43, 217, 101)"></button>
+          </div>
+          <div class="pensettings" data-color="#ffdd33">
+            <button id="yellow-btn" class="color" style="background-color: rgb(255, 221, 51)"></button>
+          </div>
+        </div>
+      </nav>
+      <div id="editor" touch-action="none"></div>
     </div>
+    <div class="highlight-column">
+      <ul id="highlight-list"></ul>
+    </div>
+  </div>
 
-    <script>
-      const editorElement = document.getElementById("editor");
-      const undoElement = document.getElementById("undo");
-      const redoElement = document.getElementById("redo");
-      const colors = document.querySelectorAll(".pensettings");
-      const highlightListElement = document.getElementById("highlight-list");
+  <script>
+    const editorElement = document.getElementById("editor");
+    const undoElement = document.getElementById("undo");
+    const redoElement = document.getElementById("redo");
+    const colors = document.querySelectorAll(".pensettings");
+    const highlightListElement = document.getElementById("highlight-list");
 
-      let editor;
+    let editor;
 
-      function clearHighlightList() {
-        while (highlightListElement.firstChild) {
-          highlightListElement.removeChild(highlightListElement.firstChild)
+    function clearHighlightList() {
+      while (highlightListElement.firstChild) {
+        highlightListElement.removeChild(highlightListElement.firstChild)
+      }
+    }
+
+    function extractColor(style) {
+      const regexColor = /; color:\s#([0-9a-f]{3}){1,2}/i;
+      if (regexColor.test(style)) {
+        const rule = style.match(regexColor);
+        const regexCss = rule[0].match(/#([0-9a-f]{3}){1,2}/i);
+        return regexCss[0];
+      }
+    }
+
+    function extractBackgroundColor(style) {
+      const regexBackground = /-myscript-text-decoration-background-color:\s#([0-9a-f]{3}){1,2}/i;
+      if (regexBackground.test(style)) {
+        const rule = style.match(regexBackground);
+        const regexCss = rule[0].match(/#([0-9a-f]{3}){1,2}/i);
+        return regexCss[0];
+      }
+    }
+
+    function displayHighlightWords(jiix) {
+      if (!jiix || !jiix.spans?.length) {
+        return;
+      }
+
+      console.log('hightlit jiix',jiix)
+
+      console.log('highlighting jiix', jiix);
+      const highlightSpans = jiix.spans.filter((span) => {
+        console.log('jiix SPAN', span)
+        return span.class.indexOf("text-highlight") !== -1;
+      });
+
+      const label = jiix.label;
+      
+      const highlightWords = highlightSpans.map((span) => {
+        const lastCharIndex = span["last-char"] + 1;
+        const cleanLabel = label.substring(span["first-char"], lastCharIndex).replace(/\r?\n/g, "");
+        return {
+          label: cleanLabel,
+          style: span.style,
+          id: `idLabel-${cleanLabel.replace(/\W/g, "-")}`
+        };
+      });
+
+  
+      console.log('highlightWords', highlightWords)
+      console.log(' highlight LIst El', highlightListElement);
+
+      highlightWords.forEach((word) => {
+        const li = document.createElement("li");
+        li.id = `${word.id}`;
+        li.textContent = word.label;
+        li.style.backgroundColor = extractBackgroundColor(word.style);
+        li.style.color = extractColor(word.style);
+        highlightListElement.append(li);
+      });
+    }
+
+    async function spellCheck(word, span) {
+      const url = 'https://api.ai21.com/studio/v1/gec';
+      const options = {
+        method: 'POST',
+        headers: {
+          accept: 'application/json',
+          'content-type': 'application/json',
+          Authorization: 'Bearer GzEiUAgBjzJqBUOooHifDpN0WY55a5l7'
+        },
+        body: JSON.stringify({ text: word })
+      };
+
+      try {
+        const response = await fetch(url, options);
+        const json = await response.json();
+        const suggestion = json.corrections[0]?.suggestion;
+        if (suggestion && suggestion.toLowerCase() !== word) {
+          span.classList.add('underline'); // Apply underline class
+        } else {
+          span.classList.remove('underline'); // Remove underline class if no suggestion
         }
+      } catch (err) {
+        console.error('error:', err);
       }
+    }
 
-      function extractColor(style) {
-          const regexColor = /; color:\s#([0-9a-f]{3}){1,2}/i;
-          if (regexColor.test(style)) {
-            const rule = style.match(regexColor);
-            const regexCss = rule[0].match(/#([0-9a-f]{3}){1,2}/i);
-            return regexCss[0];
-          }
-      }
+    async function loadEditor() {
+      const res = await fetch("../server-configuration.json");
+      const conf = await res.json();
 
-      function extractBackgroundColor(style) {
-        const regexBackground = /-myscript-text-decoration-background-color:\s#([0-9a-f]{3}){1,2}/i;
-          if (regexBackground.test(style)) {
-            const rule = style.match(regexBackground);
-            const regexCss = rule[0].match(/#([0-9a-f]{3}){1,2}/i);
-            return regexCss[0];
-          }
-      }
-
-      function displayHightlightWords(jiix) {
-        if(!jiix || !jiix.spans?.length) {
-          return
-        }
-        const highlightSpans = jiix.spans.filter((span) => {
-          return span.class.indexOf("text-highlight") !== -1;
-        })
-        const label = jiix.label;
-        const highlightWords = highlightSpans.map((span) => {
-          const lastCharIndex = span["last-char"] + 1;
-          const cleanLabel = label.substring(span["first-char"], lastCharIndex).replace(/\r?\n/g, "");
-          return {
-            label: cleanLabel,
-            style: span.style,
-            id: `idLabel-${cleanLabel.replace(/\W/g, "-")}`
-          };
-        })
-        highlightWords.forEach((word) => {
-          const li = document.createElement("li");
-          li.id = `${word.id}`;
-          li.textContent = word.label;
-          li.style.backgroundColor = extractBackgroundColor(word.style);
-          li.style.color = extractColor(word.style);
-          highlightListElement.append(li)
-        })
-      }
-
-      async function loadEditor() {
-        const res = await fetch("../server-configuration.json");
-        const conf = await res.json();
-
-        const options = {
-          configuration: {
-            server: {
-              ...conf,
-              protocol: "WEBSOCKET"
-            },
-            recognition: {
-              type: "TEXT",
-              export: {
-                jiix: {
-                  style: true
-                }
+      const options = {
+        configuration: {
+          server: {
+            ...conf,
+            protocol: "WEBSOCKET"
+          },
+          recognition: {
+            type: "TEXT",
+            export: {
+              jiix: {
+                style: true
               }
             }
           }
-        };
-
-        /**
-         * Instanciate editor
-         * @param {Element} The DOM element to attach the ink paper
-         * @param {Object} The Editor parameters
-         */
-        editor = new iink.Editor(editorElement, options);
-        /**
-         *  async initialize editor behaviors
-         */
-        await editor.initialize();
-
-        function handleColorClick(event) {
-          if (event && event.currentTarget) {
-            editor.penStyle = {
-              color: event.currentTarget.getAttribute("data-color"),
-              "-myscript-pen-width": 1
-            };
-            const check = document.getElementById("check");
-            event.currentTarget.querySelector(".color").appendChild(check);
-          }
         }
-
-        /**
-         * Init listeners
-         */
-        editorElement.addEventListener("changed", (event) => {
-          undoElement.disabled = !event.detail.canUndo;
-          redoElement.disabled = !event.detail.canRedo;
-        });
-
-        editorElement.addEventListener("exported", (event) => {
-          const exports = event.detail;
-          clearHighlightList();
-          if (exports) {
-            displayHightlightWords(exports["application/vnd.myscript.jiix"])
-          }
-        });
-
-        undoElement.addEventListener("click", () => {
-          editor.undo();
-        });
-
-        redoElement.addEventListener("click", () => {
-          editor.redo();
-        });
-
-        colors.forEach((el) => {
-          el.addEventListener("click", handleColorClick);
-        });
-
-        window.addEventListener("resize", () => {
-          editor.resize();
-        });
       };
 
-      loadEditor().catch(error => console.error(error));
-    </script>
-  </body>
+      /**
+       * Instanciate editor
+       * @param {Element} The DOM element to attach the ink paper
+       * @param {Object} The Editor parameters
+       */
+      editor = new iink.Editor(editorElement, options);
+      /**
+       *  async initialize editor behaviors
+       */
+      await editor.initialize();
+
+      function handleColorClick(event) {
+        if (event && event.currentTarget) {
+          editor.penStyle = {
+            color: event.currentTarget.getAttribute("data-color"),
+            "-myscript-pen-width": 1
+          };
+          const check = document.getElementById("check");
+          event.currentTarget.querySelector(".color").appendChild(check);
+        }
+      }
+
+      /**
+       * Init listeners
+       */
+      editorElement.addEventListener("changed", (event) => {
+        undoElement.disabled = !event.detail.canUndo;
+        redoElement.disabled = !event.detail.canRedo;
+      });
+
+      editorElement.addEventListener("exported", (event) => {
+        const exports = event.detail;
+        clearHighlightList();
+        if (exports) {
+          console.log('exports["application/vnd.myscript.jiix"]', exports["application/vnd.myscript.jiix"]);
+          displayHighlightWords(exports["application/vnd.myscript.jiix"]);
+        }
+      });
+
+      undoElement.addEventListener("click", () => {
+        editor.undo();
+      });
+
+      redoElement.addEventListener("click", () => {
+        editor.redo();
+      });
+
+      colors.forEach((el) => {
+        el.addEventListener("click", handleColorClick);
+      });
+
+      window.addEventListener("resize", () => {
+        editor.resize();
+      });
+    }
+
+    loadEditor().catch(error => console.error(error));
+  </script>
+</body>
 </html>
