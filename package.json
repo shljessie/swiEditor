@@ -33,7 +33,9 @@
     "build:lib": "rollup -c config/rollup.config.build.mjs --sourcemap",
     "build": "npm-run-all lint:fix test:unit build:lib build:docs",
     "dev": "rollup -c config/rollup.config.dev.mjs -w --sourcemap",
-    "start": "node dist/iink.js"
+    "start": "node dist/iink.js",
+    "deploy": "gh-pages -d dist"
+    
   },
   "dependencies": {
     "@david8128/ai21": "^1.2.0",
@@ -52,6 +54,7 @@
     "eslint": "^8.52.0",
     "eslint-plugin-jest": "^27.4.3",
     "eslint-plugin-playwright": "^1.5.4",
+    "gh-pages": "^6.1.1",
     "jest": "^29.7.0",
     "jest-canvas-mock": "^2.5.2",
     "jest-environment-jsdom": "^29.7.0",
